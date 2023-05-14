@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistiques</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+<div th:replace="fragments/navbar :: header"></div>
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-lg-4">
+            <form th:action="@{/features}" th:object="${request}" method="post">
+                <div class="mb-3">
+                    <div class="form-group">
+                        <label for="date">Date:</label>
+                        <input type="date" class="form-control" id="date" th:field="*{date}" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="tranche_age" class="form-label">Tranche d'âge</label>
+                    <select id="tranche_age" name="tranche_age" class="form-select" th:field="*{tranche_age}" required>
+                        <option value="(0-2)">0-2</option>
+                        <option value="(4-6)">4-6</option>
+                        <option value="(8-12)">8-12</option>
+                        <option value="(15-20)">15-20</option>
+                        <option value="(25-32)">25-32</option>
+                        <option value="(38-43)">38-43</option>
+                        <option value="(48-53)">48-53</option>
+                        <option value="(60-100)">60-100</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Sexe</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="homme" name="sexe" value="Male" th:checked="${request.sexe() == 'Male'}" required>
+                        <label class="form-check-label" for="homme">Homme</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" id="femme" name="sexe" value="Female" th:checked="${request.sexe() == 'Female'}" required>
+                        <label class="form-check-label" for="femme">Femme</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-dark">Rechercher</button>
+            </form>
+
+        </div>
+        <div class="col-lg-8">
+            <input type="hidden" th:if="${statistics}" th:value="${statistics!=null ? statistics : '[]'}" id="data">
+            <div th:if="${statistics}">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:if="${statistics}">
+    const ctx = document.getElementById('myChart');
+    let statistics_data =JSON.parse(document.getElementById("data").value);
+    console.log(statistics_data)
+
+    const data = {
+        labels: ['Angry', 'Disgust', 'Fear', 'Happy', 'Neutral','Sad','Surprise'],
+        datasets: [
+            {
+                label: 'pourcentage : ',
+                data: statistics_data,
+               /* backgroundColor: Object.values(Utils.CHART_COLORS),*/
+            }
+        ]
+    };
+    const config = {
+        type: 'pie',
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Statistic emotions'
+                }
+            }
+        },
+    };
+    new Chart(ctx,config)
+</script>
+</html>
